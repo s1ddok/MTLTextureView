@@ -6,9 +6,11 @@
 //  Copyright © 2018 Andrey Volodin. All rights reserved.
 //
 
+#if targetEnvironment(simulator)
+#else
+
 import Metal
 import UIKit
-import simd
 
 /** Tiny UIView subclass that acts like UIImageView. Can be used to efficiently display contents of MTLTexture. */
 // TODO:
@@ -749,3 +751,5 @@ fileprivate extension MTLTextureView {
         0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     ]
 }
+
+#endif
