@@ -1,0 +1,166 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		931CDF162140427100EB98EE /* MTLTextureViewShaderLibrary.metal in Sources */ = {isa = PBXBuildFile; fileRef = 931CDF152140427100EB98EE /* MTLTextureViewShaderLibrary.metal */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		931CDF122140427100EB98EE /* MTLTextureViewShaderLibrary.metallib */ = {isa = PBXFileReference; explicitFileType = "archive.metal-library"; includeInIndex = 0; path = MTLTextureViewShaderLibrary.metallib; sourceTree = BUILT_PRODUCTS_DIR; };
+		931CDF152140427100EB98EE /* MTLTextureViewShaderLibrary.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = MTLTextureViewShaderLibrary.metal; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		931CDF0B2140427100EB98EE = {
+			isa = PBXGroup;
+			children = (
+				931CDF142140427100EB98EE /* MTLTextureViewShaderLibrary */,
+				931CDF132140427100EB98EE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		931CDF132140427100EB98EE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				931CDF122140427100EB98EE /* MTLTextureViewShaderLibrary.metallib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		931CDF142140427100EB98EE /* MTLTextureViewShaderLibrary */ = {
+			isa = PBXGroup;
+			children = (
+				931CDF152140427100EB98EE /* MTLTextureViewShaderLibrary.metal */,
+			);
+			path = MTLTextureViewShaderLibrary;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		931CDF112140427100EB98EE /* MTLTextureViewShaderLibrary */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 931CDF192140427100EB98EE /* Build configuration list for PBXNativeTarget "MTLTextureViewShaderLibrary" */;
+			buildPhases = (
+				931CDF102140427100EB98EE /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MTLTextureViewShaderLibrary;
+			productName = MTLTextureViewShaderLibrary;
+			productReference = 931CDF122140427100EB98EE /* MTLTextureViewShaderLibrary.metallib */;
+			productType = "com.apple.product-type.metal-library";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		931CDF0C2140427100EB98EE /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1000;
+				ORGANIZATIONNAME = "Andrey Volodin";
+				TargetAttributes = {
+					931CDF112140427100EB98EE = {
+						CreatedOnToolsVersion = 10.0;
+					};
+				};
+			};
+			buildConfigurationList = 931CDF0F2140427100EB98EE /* Build configuration list for PBXProject "MTLTextureViewShaderLibrary" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 931CDF0B2140427100EB98EE;
+			productRefGroup = 931CDF132140427100EB98EE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				931CDF112140427100EB98EE /* MTLTextureViewShaderLibrary */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		931CDF102140427100EB98EE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				931CDF162140427100EB98EE /* MTLTextureViewShaderLibrary.metal in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		931CDF172140427100EB98EE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		931CDF182140427100EB98EE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Release;
+		};
+		931CDF1A2140427100EB98EE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = PR6HV9J6AD;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		931CDF1B2140427100EB98EE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = PR6HV9J6AD;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		931CDF0F2140427100EB98EE /* Build configuration list for PBXProject "MTLTextureViewShaderLibrary" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				931CDF172140427100EB98EE /* Debug */,
+				931CDF182140427100EB98EE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		931CDF192140427100EB98EE /* Build configuration list for PBXNativeTarget "MTLTextureViewShaderLibrary" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				931CDF1A2140427100EB98EE /* Debug */,
+				931CDF1B2140427100EB98EE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 931CDF0C2140427100EB98EE /* Project object */;
+}
