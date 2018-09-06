@@ -18,7 +18,7 @@ vertex MTLTextureViewVertexOut mtlTextureViewVertex(uint vid [[vertex_id]]) {
     MTLTextureViewVertexOut out;
     
     const float2 vertices[] = { float2(-1.0f, 1.0f), float2(-1.0f, -1.0f),
-        float2(1.0f, 1.0f), float2(1.0f, -1.0f)
+                                float2(1.0f, 1.0f), float2(1.0f, -1.0f)
     };
     
     out.position = float4(vertices[vid], 0.0, 1.0);
@@ -30,8 +30,8 @@ vertex MTLTextureViewVertexOut mtlTextureViewVertex(uint vid [[vertex_id]]) {
 }
 
 fragment half4 mtlTextureViewFragment(MTLTextureViewVertexOut in [[stage_in]],
-                                      texture2d<float, access::sample> tex2d [[texture(0)]],
-                                      constant float2& resolution){
+                                      texture2d<float, access::sample> tex2d [[texture(0)]])
+{
     constexpr sampler s(coord::normalized,
                         address::clamp_to_zero,
                         filter::linear);
