@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "MTLTextureView"
-  s.version      = "0.1.0"
+  s.version      = "0.1.1"
   s.summary      = "Tiny UIView subclass that acts like UIImageView but for MTLTextures"
 
   s.description  = <<-DESC
