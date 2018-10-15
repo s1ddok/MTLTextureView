@@ -90,33 +90,27 @@ public class MTLTextureView: UIView {
     // MARK: Drawing code
     
     /** Encodes render commands into provided command buffer. Does not call 'commit'. */
-    public func draw(in commandBuffer: MTLCommandBuffer) {
-        let waitResult = self.semaphore.wait(timeout: .now())
-        guard waitResult == .success else { return }
-        
+    public func draw(in commandBuffer: MTLCommandBuffer, fence: MTLFence? = nil) {
         guard let drawable = self.layer.nextDrawable()
-        else {
-            self.semaphore.signal()
-            return
-        }
+            else { return }
         
         self.renderPassDescriptor.colorAttachments[0].texture = drawable.texture
         
         guard let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: self.renderPassDescriptor)
-        else {
-            self.semaphore.signal()
-            return
+            else { return }
+        
+        if let f = fence {
+            renderEncoder.waitForFence(f, before: .fragment)
         }
         
         if let textureToDraw = self.texture {
             renderEncoder.setRenderPipelineState(self.renderPipelineState)
-            renderEncoder.setFragmentTexture(self.texture, index: 0)
+            renderEncoder.setFragmentTexture(textureToDraw, index: 0)
             renderEncoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: 4)
         }
         renderEncoder.endEncoding()
         
         commandBuffer.present(drawable)
-        commandBuffer.addScheduledHandler { [weak self] buffer in self?.semaphore.signal() }
     }
     
     // MARK: Implementation details
