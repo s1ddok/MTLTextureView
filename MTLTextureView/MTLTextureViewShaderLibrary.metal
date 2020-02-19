@@ -14,7 +14,8 @@ struct MTLTextureViewVertexOut {
     float2 uv;
 };
 
-vertex MTLTextureViewVertexOut mtlTextureViewVertex(uint vid [[vertex_id]]) {
+vertex MTLTextureViewVertexOut mtlTextureViewVertex(uint vid [[vertex_id]])
+{
     MTLTextureViewVertexOut out;
     
     const float2 vertices[] = { float2(-1.0f, 1.0f), float2(-1.0f, -1.0f),
@@ -29,14 +30,13 @@ vertex MTLTextureViewVertexOut mtlTextureViewVertex(uint vid [[vertex_id]]) {
     return out;
 }
 
-fragment half4 mtlTextureViewFragment(MTLTextureViewVertexOut in [[stage_in]],
+fragment float4 mtlTextureViewFragment(MTLTextureViewVertexOut in [[stage_in]],
                                       texture2d<float, access::sample> tex2d [[texture(0)]])
 {
     constexpr sampler s(coord::normalized,
                         address::clamp_to_zero,
                         filter::linear);
     
-    half4 color = half4(tex2d.sample(s, in.uv));
-    return color;
+    return tex2d.sample(s, in.uv);
 }
 

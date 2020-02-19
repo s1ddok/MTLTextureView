@@ -16,13 +16,25 @@ import UIKit
 // TODO:
 // 1. Add internal render-loop
 // 2. Support automatic redrawing
-@available(swift 4.2)
 @available(macOS 10.11, iOS 8.0, *)
 public class MTLTextureView: UIView {
     /** A texture to display. Default is nil */
     public var texture: MTLTexture? = nil
     /** The device used to create Metal objects.*/
     public let device: MTLDevice
+    
+    public var pixelFormat: MTLPixelFormat {
+        get { self.layer.pixelFormat }
+        set {
+            self.layer.pixelFormat = newValue
+            self.updateRenderPipelineState()
+        }
+    }
+    
+    public var colorSpace: CGColorSpace? {
+        get { self.layer.colorspace }
+        set { self.layer.colorspace = newValue }
+    }
     
     /** A Boolean value that controls whether to resize the drawable as the view changes size. */
     public var autoResizeDrawable: Bool = true {
@@ -40,12 +52,12 @@ public class MTLTextureView: UIView {
     }
     
     fileprivate let renderPassDescriptor = MTLRenderPassDescriptor()
-    fileprivate let renderPipelineState: MTLRenderPipelineState
+    fileprivate var renderPipelineState: MTLRenderPipelineState
     fileprivate let semaphore = DispatchSemaphore(value: 2)
     
-    public init(device: MTLDevice) {
+    public init(device: MTLDevice, pixelFormat: MTLPixelFormat = .bgra8Unorm) {
         self.device = device
-        self.renderPipelineState = MTLTextureView.makeRenderState(for: device)
+        self.renderPipelineState = MTLTextureView.makeRenderState(for: device, pixelFormat: pixelFormat)
         
         super.init(frame: .zero)
         commonInit()
@@ -53,7 +65,7 @@ public class MTLTextureView: UIView {
     
     required init?(coder aDecoder: NSCoder) {
         self.device = MTLCreateSystemDefaultDevice()!
-        self.renderPipelineState = MTLTextureView.makeRenderState(for: device)
+        self.renderPipelineState = MTLTextureView.makeRenderState(for: device, pixelFormat: .bgra8Unorm)
         
         super.init(coder: aDecoder)
         commonInit()
@@ -61,7 +73,6 @@ public class MTLTextureView: UIView {
     
     fileprivate func commonInit() {
         self.layer.device = device
-        self.layer.pixelFormat = .bgra8Unorm
         self.layer.framebufferOnly = true
         self.layer.isOpaque = false
         if #available(iOS 11.2, *) {
@@ -72,6 +83,11 @@ public class MTLTextureView: UIView {
         self.renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0)
         
         self.backgroundColor = .clear
+    }
+    
+    public func updateRenderPipelineState() {
+        self.renderPipelineState = MTLTextureView.makeRenderState(for: self.device,
+                                                                  pixelFormat: self.layer.pixelFormat)
     }
     
     /** Set the size of the metal drawables when the view is resized. */
@@ -92,12 +108,12 @@ public class MTLTextureView: UIView {
     /** Encodes render commands into provided command buffer. Does not call 'commit'. */
     public func draw(in commandBuffer: MTLCommandBuffer, fence: MTLFence? = nil) {
         guard let drawable = self.layer.nextDrawable()
-            else { return }
+        else { return }
         
         self.renderPassDescriptor.colorAttachments[0].texture = drawable.texture
         
         guard let renderEncoder = commandBuffer.makeRenderCommandEncoder(descriptor: self.renderPassDescriptor)
-            else { return }
+        else { return }
         
         if let f = fence {
             renderEncoder.waitForFence(f, before: .fragment)
@@ -125,13 +141,13 @@ public class MTLTextureView: UIView {
 }
 
 fileprivate extension MTLTextureView {
-    static func makeRenderState(for device: MTLDevice) -> MTLRenderPipelineState {
+    static func makeRenderState(for device: MTLDevice, pixelFormat: MTLPixelFormat) -> MTLRenderPipelineState {
         let library = try! device.makeDefaultLibrary(bundle: Bundle(for: MTLTextureView.self))
         
         let renderStateDescriptor = MTLRenderPipelineDescriptor()
         renderStateDescriptor.vertexFunction = library.makeFunction(name: "mtlTextureViewVertex")
         renderStateDescriptor.fragmentFunction = library.makeFunction(name: "mtlTextureViewFragment")
-        renderStateDescriptor.colorAttachments[0].pixelFormat = .bgra8Unorm
+        renderStateDescriptor.colorAttachments[0].pixelFormat = pixelFormat
         renderStateDescriptor.colorAttachments[0].isBlendingEnabled = false
         
         guard let renderState = try? device.makeRenderPipelineState(descriptor: renderStateDescriptor)
