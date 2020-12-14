@@ -19,7 +19,7 @@ Pod::Spec.new do |s|
     :git => "https://github.com/s1ddok/MTLTextureView.git",
     :tag => "#{s.version}"
   }
-  s.source_files = "Sources/*.{swift,metal}"
+  s.source_files = "Sources/MTLTextureView/*.{swift,metal}"
 
   s.swift_version = "5.2"
 
