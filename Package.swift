@@ -16,6 +16,7 @@ let package = Package(
     targets: [
         .target(name: "MTLTextureView",
                 dependencies: ["Alloy"],
-                resources: [.process("MTLTextureViewShaderLibrary.metal")])
+                resources: [.process("MTLTextureViewShaderLibrary.metal")],
+                swiftSettings: [.define("SWIFT_PM")])
     ]
 )

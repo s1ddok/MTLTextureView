@@ -254,7 +254,7 @@ public class MTLTextureView: UIView {
     // MARK - Pipeline State Init
 
     private static func makeRenderState(for device: MTLDevice, pixelFormat: MTLPixelFormat) -> MTLRenderPipelineState {
-        let library = try! device.makeDefaultLibrary(bundle: Bundle(for: Self.self))
+        let library = try! device.makeDefaultLibrary(bundle: .module)
 
         let renderStateDescriptor = MTLRenderPipelineDescriptor()
         renderStateDescriptor.label = "MTLTextureView"
@@ -269,5 +269,11 @@ public class MTLTextureView: UIView {
     }
 
 }
+
+#if !SWIFT_PM
+public extension Bundle {
+    static var module = Bundle(for: MTLTextureView.self)
+}
+#endif
 
 #endif
