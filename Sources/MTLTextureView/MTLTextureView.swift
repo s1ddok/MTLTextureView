@@ -1,14 +1,13 @@
-#if !targetEnvironment(simulator)
-
-import Metal
-import UIKit
+import Alloy
 import simd
 
 /** Tiny UIView subclass that acts like UIImageView. Can be used to efficiently display contents of MTLTexture. */
 // TODO:
 // 1. Add internal render-loop
 // 2. Support automatic redrawing
-@available(macOS 10.11, iOS 8.0, *)
+@available(iOS 11.0, macCatalyst 10.15, *)
+@available(macOS, unavailable)
+@available(tvOS, unavailable)
 public class MTLTextureView: UIView {
 
     // MARK: - Type Definitions
@@ -32,16 +31,8 @@ public class MTLTextureView: UIView {
         }
     }
     /** The device used to create Metal objects.*/
-    public let device: MTLDevice
-    
-    public var pixelFormat: MTLPixelFormat {
-        get { self.layer.pixelFormat }
-        set {
-            self.layer.pixelFormat = newValue
-            self.updateRenderPipelineState()
-        }
-    }
-    
+    public var device: MTLDevice { self.library.device }
+    public var pixelFormat: MTLPixelFormat { self.layer.pixelFormat }
     public var colorSpace: CGColorSpace? {
         get { self.layer.colorspace }
         set { self.layer.colorspace = newValue }
@@ -50,7 +41,7 @@ public class MTLTextureView: UIView {
     /** A Boolean value that controls whether to resize the drawable as the view changes size. */
     public var autoResizeDrawable: Bool = true {
         didSet {
-            if autoResizeDrawable {
+            if self.autoResizeDrawable {
                 self.setNeedsLayout()
             }
         }
@@ -72,29 +63,32 @@ public class MTLTextureView: UIView {
             }
         }
     }
-    
-    private let renderPassDescriptor = MTLRenderPassDescriptor()
+
+    private let library: MTLLibrary
     private var renderPipelineState: MTLRenderPipelineState
+    private let renderPassDescriptor = MTLRenderPassDescriptor()
     private let semaphore = DispatchSemaphore(value: 2)
     private var projectionMatrix = matrix_identity_float4x4
 
     // MARK: - Life Cycle
     
     public init(device: MTLDevice,
-                pixelFormat: MTLPixelFormat = .bgra8Unorm) {
-        self.device = device
-        self.renderPipelineState = Self.makeRenderState(for: device,
-                                                        pixelFormat: pixelFormat)
-        
+                pixelFormat: MTLPixelFormat = .bgra8Unorm) throws {
+        self.library = try device.makeDefaultLibrary(bundle: .module)
+        self.renderPipelineState = try Self.renderStateWithLibrary(self.library,
+                                                                   pixelFormat: pixelFormat)
         super.init(frame: .zero)
         self.commonInit()
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
-        self.device = MTLCreateSystemDefaultDevice()!
-        self.renderPipelineState = Self.makeRenderState(for: self.device,
-                                                        pixelFormat: .bgra8Unorm)
-        
+        guard let device = MTLCreateSystemDefaultDevice(),
+              let library = try? device.makeDefaultLibrary(bundle: .module),
+              let renderPipelineState = try? Self.renderStateWithLibrary(library,
+                                                                         pixelFormat: .bgra8Unorm)
+        else { return nil }
+        self.library = library
+        self.renderPipelineState = renderPipelineState
         super.init(coder: aDecoder)
         self.commonInit()
     }
@@ -126,19 +120,21 @@ public class MTLTextureView: UIView {
         self.layer.device = self.device
         self.layer.framebufferOnly = true
         self.layer.isOpaque = false
-        if #available(iOS 11.2, *) {
-            self.layer.maximumDrawableCount = 2
-        }
+        self.layer.maximumDrawableCount = 2
         
         self.renderPassDescriptor.colorAttachments[0].loadAction = .clear
-        self.renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0)
+        self.renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: 0,
+                                                                                 green: 0,
+                                                                                 blue: 0,
+                                                                                 alpha: 0)
         
         self.backgroundColor = .clear
     }
     
-    public func updateRenderPipelineState() {
-        self.renderPipelineState = Self.makeRenderState(for: self.device,
-                                                        pixelFormat: self.layer.pixelFormat)
+    public func setPixelFormat(_ pixelFormat: MTLPixelFormat) throws {
+        self.renderPipelineState = try Self.renderStateWithLibrary(self.library,
+                                                                   pixelFormat: pixelFormat)
+        self.layer.pixelFormat = pixelFormat
     }
 
     // MARK: - Helpers
@@ -253,27 +249,19 @@ public class MTLTextureView: UIView {
 
     // MARK - Pipeline State Init
 
-    private static func makeRenderState(for device: MTLDevice, pixelFormat: MTLPixelFormat) -> MTLRenderPipelineState {
-        let library = try! device.makeDefaultLibrary(bundle: .module)
+    public static let vertexFunctionName = "vertexFunction"
+    public static let fragmentFunctionName = "fragmentFunction"
 
+    private static func renderStateWithLibrary(_ library: MTLLibrary,
+                                               pixelFormat: MTLPixelFormat) throws -> MTLRenderPipelineState {
         let renderStateDescriptor = MTLRenderPipelineDescriptor()
         renderStateDescriptor.label = "MTLTextureView"
-        renderStateDescriptor.vertexFunction = library.makeFunction(name: "vertexFunction")
-        renderStateDescriptor.fragmentFunction = library.makeFunction(name: "fragmentFunction")
+        renderStateDescriptor.vertexFunction = library.makeFunction(name: Self.vertexFunctionName)
+        renderStateDescriptor.fragmentFunction = library.makeFunction(name: Self.fragmentFunctionName)
         renderStateDescriptor.colorAttachments[0].pixelFormat = pixelFormat
         renderStateDescriptor.colorAttachments[0].isBlendingEnabled = false
 
-        guard let renderState = try? device.makeRenderPipelineState(descriptor: renderStateDescriptor)
-        else { fatalError("Could not initialize render state") }
-        return renderState
+        return try library.device.makeRenderPipelineState(descriptor: renderStateDescriptor)
     }
 
 }
-
-#if !SWIFT_PM
-public extension Bundle {
-    static var module = Bundle(for: MTLTextureView.self)
-}
-#endif
-
-#endif

@@ -4,19 +4,21 @@ import PackageDescription
 
 let package = Package(
     name: "MTLTextureView",
-    platforms: [.iOS(.v11)],
+    platforms: [
+        .iOS(.v13),
+        .macOS(.v10_15)
+    ],
     products: [
         .library(name: "MTLTextureView",
                  targets: ["MTLTextureView"]),
     ], dependencies: [
         .package(name: "Alloy",
-                 url: "https://github.com/s1ddok/Alloy",
-                 .upToNextMinor(from: "0.16.4"))
+                 url: "https://github.com/s1ddok/Alloy.git",
+                 .upToNextMajor(from: "0.17.0"))
     ],
     targets: [
         .target(name: "MTLTextureView",
                 dependencies: ["Alloy"],
-                resources: [.process("MTLTextureViewShaderLibrary.metal")],
-                swiftSettings: [.define("SWIFT_PM")])
+                resources: [.process("MTLTextureViewShaderLibrary.metal")])
     ]
 )
